@@ -1,61 +1,52 @@
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
-from skmultiflow.drift_detection import EDDM, ADWIN, HDDM_W
+from river.drift import HDDM_W, ADWIN, EDDM
 
-from skidless import drift
+import drift
 
 
-def drift_eddm(error_rate, list_experiment_results):
+def drift_eddm(error_rate):
     """
     Detects if a drift has happened using EDDM detector
     """
     eddm = EDDM()
-    index_alarm = []
-    for i in range(len(error_rate)):
-        eddm.add_element(error_rate[i])
-        if eddm.detected_warning_zone():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-        if eddm.detected_change():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-    return list_experiment_results, index_alarm
+    print_warning = True
+    for i, x in enumerate(error_rate):
+        _ = eddm.update(x)
+        if eddm.warning_detected and print_warning:
+            print(f"Warning detected at index {i}")
+            print_warning = False
+        if eddm.change_detected:
+            print(f"Change detected at index {i}")
+            print_warning = True
 
 
-def drift_hddm_w(error_rate, list_experiment_results):
+def drift_hddm_w(error_rate):
     """
     Detects if a drift has happened using HDDM_W detector
     """
     hddm_w = HDDM_W()
-    index_alarm = []
-    for i in range(len(error_rate)):
-        hddm_w.add_element(error_rate[i])
-        if hddm_w.detected_warning_zone():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-        if hddm_w.detected_change():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-    return list_experiment_results, index_alarm
+    print_warning = True
+    for i, x in enumerate(error_rate):
+        _ = hddm_w.update(x)
+        if hddm_w.warning_detected and print_warning:
+            print(f"Warning detected at index {i}")
+            print_warning = False
+        if hddm_w.change_detected:
+            print(f"Change detected at index {i}")
+            print_warning = True
 
 
-def drift_adwin(error_rate: np.array, list_experiment_results: list):
+def drift_adwin(error_rate: np.array):
     """
     Detects if a drift has happened using ADWIN detector
     """
     error_rate_float = error_rate.astype('float32')
-    index_alarm = []
     adwin = ADWIN()
-    for i in range(len(error_rate_float)):
-        adwin.add_element(error_rate_float[i])
-        if adwin.detected_warning_zone():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-        if adwin.detected_change():
-            list_experiment_results.append(True)
-            index_alarm.append(i)
-    return list_experiment_results, index_alarm
+    for i, val in enumerate(error_rate_float):
+        _ = adwin.update(val)
+        if adwin.change_detected:
+            print(f"Change detected at index {i}")
 
 
 def drift_with_labels(error_rate: np.array, method: str = "HDDM_W"):
@@ -64,14 +55,11 @@ def drift_with_labels(error_rate: np.array, method: str = "HDDM_W"):
     """
     list_experiment_results = []
     if method == "EDDM":
-        list_experiment_results, index_alarm = drift_eddm(error_rate, list_experiment_results)
+        drift_eddm(error_rate)
     elif method == "ADWIN":
-        list_experiment_results, index_alarm = drift_adwin(error_rate, list_experiment_results)
+        drift_adwin(error_rate)
     elif method == "HDDM_W":
-        list_experiment_results, index_alarm = drift_hddm_w(error_rate, list_experiment_results)
-    else:
-        list_experiment_results, index_alarm = None, None
-    return list_experiment_results, index_alarm
+        drift_hddm_w(error_rate)
 
 
 def drift_detector_with_labels_test(data_to_compare: pd.DataFrame,
@@ -81,7 +69,6 @@ def drift_detector_with_labels_test(data_to_compare: pd.DataFrame,
     """
     Compare each variable of the two dataframes with a chosen labeled test
     """
-    plt.figure(figsize=(20, 4))
     x_to_compare_sample = data_to_compare.loc[:, data_to_compare.columns != label_col]
     y_to_compare_sample = np.array(data_to_compare[label_col])
     y_hat = np.array(model.predict(x_to_compare_sample))
@@ -90,10 +77,7 @@ def drift_detector_with_labels_test(data_to_compare: pd.DataFrame,
     else:
         error_rate = (y_to_compare_sample != y_hat).astype(int)
     error_rate = np.array(error_rate)
-    has_data_drifted, index_alarm = drift_with_labels(error_rate, method=test_name)
-    plt.plot(error_rate)
-    plt.show()
-    return has_data_drifted, index_alarm
+    drift_with_labels(error_rate, method=test_name)
 
 
 def drift_detector_labels_gradual_drift(data_train: pd.DataFrame,
@@ -122,11 +106,10 @@ def drift_detector_labels_gradual_drift(data_train: pd.DataFrame,
                                                   value_of_drift=value_drift,
                                                   action=action)
         full_data = pd.concat([data_reference_sample, dataset_corrupted], axis=0)
-        has_data_drifted, index_alarm = drift_detector_with_labels_test(data_to_compare=full_data,
-                                                                        label_col=label_col,
-                                                                        model=model,
-                                                                        test_name=test_name)
-        print(has_data_drifted)
+        drift_detector_with_labels_test(data_to_compare=full_data,
+                                        label_col=label_col,
+                                        model=model,
+                                        test_name=test_name)
         days += 1
         value_drift += init_value_drift
 
@@ -161,10 +144,10 @@ def drift_detector_labels_seasonal_drift(data_train: pd.DataFrame,
                                                            value_of_drift=value_drift,
                                                            action=action)
         full_data = pd.concat([data_reference_sample, dataset_corrupted], axis=0)
-        has_data_drifted = drift_detector_with_labels_test(data_to_compare=full_data,
-                                                           label_col=label_col,
-                                                           model=model,
-                                                           test_name=test_name)
-        print(has_data_drifted)
+        drift_detector_with_labels_test(data_to_compare=full_data,
+                                        label_col=label_col,
+                                        model=model,
+                                        test_name=test_name)
         days += 1
         value_drift += init_value_drift
+
