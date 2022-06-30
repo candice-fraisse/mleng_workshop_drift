@@ -130,7 +130,6 @@ def drift_detector_labels_seasonal_drift(data_train: pd.DataFrame,
     Prints an alarm or a warning if a feature drift or anomaly has happened throughout a period of days
     """
     days = 0
-    init_value_drift = value_drift
     seasonal_days = drift.generate_frequency(nb_day=nb_days, frequency=frequency)
     data_generated = drift.dataset_generator_yield(data=data_to_compare, nb_sample=nb_sample)
     data_reference_sample = data_train.sample(n=nb_sample)
@@ -149,5 +148,4 @@ def drift_detector_labels_seasonal_drift(data_train: pd.DataFrame,
                                         model=model,
                                         test_name=test_name)
         days += 1
-        value_drift += init_value_drift
 

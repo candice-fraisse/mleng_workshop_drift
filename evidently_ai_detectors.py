@@ -6,7 +6,7 @@ from evidently.model_profile import Profile
 from evidently.model_profile.sections import DataDriftProfileSection, \
     NumTargetDriftProfileSection
 
-from skidless import drift
+import drift
 
 warnings.filterwarnings('ignore')
 warnings.simplefilter('ignore')
@@ -79,7 +79,6 @@ def evidently_ai_detect_seasonal_drift(data_train: pd.DataFrame,
     Prints an alarm or a warning if a feature drift or anomaly has happened throughout a period of days
     """
     days = 0
-    init_value_drift = value_drift
     seasonal_days = drift.generate_frequency(nb_day=nb_days, frequency=frequency)
     data_generated = drift.dataset_generator_yield(data=data_to_compare, nb_sample=nb_sample)
     while days <= nb_days:
@@ -96,4 +95,3 @@ def evidently_ai_detect_seasonal_drift(data_train: pd.DataFrame,
                                   cat_features=cat_features,
                                   label_col=label_col)
         days += 1
-        value_drift += init_value_drift

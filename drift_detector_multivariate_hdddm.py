@@ -1,7 +1,7 @@
 import pandas as pd
 from menelaus.data_drift import hdddm
 
-from skidless import drift
+import drift
 
 # github.com/mitre/menelaus/blob/dev/src/menelaus/data_drift/histogram_density_method.py
 
@@ -64,7 +64,6 @@ def hdddm_detect_seasonal_drift(data_train: pd.DataFrame,
     Prints an alarm or a warning if a feature drift or anomaly has happened throughout a period of days
     """
     days = 0
-    init_value_drift = value_drift
     seasonal_days = drift.generate_frequency(nb_day=nb_days, frequency=frequency)
     data_generated = drift.dataset_generator_yield(data=data_to_compare, nb_sample=nb_sample)
     HDM = hdddm.HistogramDensityMethod(divergence="H", detect_batch=1, statistic="stdev",
@@ -83,4 +82,3 @@ def hdddm_detect_seasonal_drift(data_train: pd.DataFrame,
         detector.update(dataset_corrupted)
         print(detector.drift_state)
         days += 1
-        value_drift += init_value_drift

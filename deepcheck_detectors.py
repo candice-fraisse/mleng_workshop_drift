@@ -5,7 +5,7 @@ from deepchecks import Dataset, checks
 from deepchecks.tabular.checks import TrainTestFeatureDrift, TrainTestPredictionDrift
 from sklearn.ensemble import RandomForestClassifier
 
-from skidless import drift
+import drift
 
 
 def deepcheck_result_feature_drift(result, val):
@@ -123,7 +123,6 @@ def deepcheck_detect_seasonal_drift(data_train: pd.DataFrame,
     Prints an alarm or a warning if a feature drift or anomaly has happened throughout a period of days
     """
     days = 0
-    init_value_drift = value_drift
     seasonal_days = drift.generate_frequency(nb_day=nb_days, frequency=frequency)
     data_generated = drift.dataset_generator_yield(data=data_to_compare, nb_sample=nb_sample)
     while days <= nb_days:
@@ -142,4 +141,3 @@ def deepcheck_detect_seasonal_drift(data_train: pd.DataFrame,
                                model=model,
                                test_type=test_type)
         days += 1
-        value_drift += init_value_drift
