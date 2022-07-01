@@ -1,8 +1,8 @@
 from typing import Optional
 
 import pandas as pd
-from deepchecks import Dataset, checks
-from deepchecks.tabular.checks import TrainTestFeatureDrift, TrainTestPredictionDrift
+from deepchecks import Dataset
+from deepchecks.tabular.checks import TrainTestFeatureDrift, TrainTestPredictionDrift, WholeDatasetDrift
 from sklearn.ensemble import RandomForestClassifier
 
 import drift
@@ -64,7 +64,7 @@ def deepcheck_detect_drift(data_train: pd.DataFrame, data_to_compare: pd.DataFra
         result = check.run(train_dataset=train_drifted_ds, test_dataset=test_drifted_ds, model=model)
         deepcheck_result_prediction_drift(result)
     elif test_type == "dataset_drift":
-        check = checks.WholeDatasetDrift(verbose=False)
+        check = WholeDatasetDrift(verbose=False)
         result = check.run(train_dataset=train_drifted_ds, test_dataset=test_drifted_ds)
         deepcheck_dataset_drift(result)
     else:

@@ -76,7 +76,6 @@ def olindda_identification(x_train_data, x_test_data, unknown_index, n_clusters)
             if overall_global_mean > np.array(mean_by_cluster_unknown.iloc[k, :]):
                 index_list.append(k)
     else:
-        print("No drift or novelty detected in batch")
         overall_global_mean = 0
         mean_by_cluster_unknown = 0
         model_unknown_kmeans = 0
@@ -207,7 +206,6 @@ def olindda_gradual_drift(data_train: pd.DataFrame,
         data_reference_sample = data_reference_sample.reset_index(drop=True)
         data_to_compare_sample = pd.DataFrame(dataset_corrupted.sample(n=nb_sample))
         data_to_compare_sample = data_to_compare_sample.reset_index(drop=True)
-        print(data_to_compare_sample)
         olindda_detect_drift(x_train_data=data_reference_sample,
                              x_test_data=data_to_compare_sample,
                              n_clusters=n_clusters)
