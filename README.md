@@ -4,10 +4,10 @@ Below is the description of the different files:
 | --- | --- |
 | Practice_concept_drifts.ipynb | A Jupyter notebook to practice drift induction & detection |
 | Practice_concept_drifts_solutions.ipynb | Solutions to the previous Jupyter notebook |
-| full_experiment_real_concept_drifts.ipynb | The full experiment containing the induction of 6 types of drift and 9 detectors |
-| full_experiment_gradual_concept_drift.ipynb | The full experiment containing the induction of 6 types of drift and 9 detectors |
-| full_experiment_seasonal_concept_drift.ipynb | The full experiment containing the induction of 6 types of drift and 9 detectors |
-| full_experiment_virtual_concept_drifts.ipynb | The full experiment containing the induction of 6 types of drift and 9 detectors |
+| full_experiment_real_concept_drifts.ipynb | The full experiment containing the induction of real concept drifts with 9 detectors |
+| full_experiment_gradual_concept_drift.ipynb | The full experiment containing the induction of gradual concept drifts with 9 detectors |
+| full_experiment_seasonal_concept_drift.ipynb | The full experiment containing the induction of seasonal concept drifts with 9 detectors |
+| full_experiment_virtual_concept_drifts.ipynb | The full experiment containing the induction of virtual concept drifts with 9 detectors |
 | drift.py | A python file containing all files to induce a concept drift (real and virtual) |
 | DeepChecks_detectors.py | A python file using DeepChecks functions to detect **abrupt, gradual and recurrent** concept drifts |
 | evidently_ai_detectors.py | A python file using Evidently AI functions to detect **abrupt, gradual and recurrent** concept drifts |
